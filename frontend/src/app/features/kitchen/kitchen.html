@@ -1,0 +1,81 @@
+<div class="flex flex-col h-full bg-warm-bg">
+  <app-staff-bar />
+
+  <header class="shrink-0 px-6 py-5 border-b border-warm-border flex items-end gap-4">
+    <div class="flex-1 min-w-0">
+      <h1 class="font-display text-2xl font-bold text-warm-fg">Cocina</h1>
+      <p class="text-warm-muted text-sm mt-0.5">
+        {{ restaurantName() }}{{ restaurantName() ? ' · ' : '' }}{{ pendingCount() }} pendiente{{ pendingCount() !== 1 ? 's' : '' }} · {{ processCount() }} en proceso
+      </p>
+    </div>
+    <span class="flex items-center gap-1.5 text-xs" [class]="live() ? 'text-status-done' : 'text-warm-muted'"
+      [title]="live() ? 'Recibiendo pedidos en tiempo real' : 'Conectando...'">
+      <span class="w-2 h-2 rounded-full" [class]="live() ? 'bg-status-done animate-pulse' : 'bg-warm-muted'"></span>
+      {{ live() ? 'En vivo' : 'Conectando' }}
+    </span>
+  </header>
+
+  @if (error()) {
+    <app-alert class="mx-4 mt-4" [dismissible]="true" (dismissed)="error.set(null)">{{ error() }}</app-alert>
+  }
+
+  @if (loading()) {
+    <app-spinner class="flex-1" />
+  } @else {
+    <div class="flex-1 overflow-x-auto overflow-y-hidden flex gap-4 p-4 snap-x snap-mandatory">
+      @for (col of columns; track col.id) {
+        <section class="flex-1 min-w-[280px] flex flex-col snap-start"
+          (dragover)="onDragOver($event, col.id)" (dragleave)="dragOver.set(null)" (drop)="onDrop($event, col.id)">
+          <div class="flex items-center gap-2 px-4 py-3 rounded-xl mb-3 border" [class]="col.header">
+            <span class="w-2.5 h-2.5 rounded-full" [class]="col.dot"></span>
+            <span class="font-semibold text-sm uppercase tracking-wider" [class]="col.text">{{ col.label }}</span>
+            <span class="ml-auto text-warm-muted text-xs font-medium">{{ ordersIn(col.id).length }}</span>
+          </div>
+
+          <div class="flex-1 overflow-y-auto space-y-3 pb-2 rounded-xl transition-colors"
+            [class.bg-warm-surface2]="dragOver() === col.id && draggingId()">
+            @for (order of ordersIn(col.id); track order.id) {
+              <article draggable="true" (dragstart)="onDragStart(order.id)" (dragend)="onDragEnd()"
+                class="bg-warm-surface rounded-2xl border border-warm-border p-4 cursor-grab active:cursor-grabbing transition-all duration-150"
+                [class]="draggingId() === order.id ? 'opacity-40 scale-95' : 'hover:border-warm-muted'">
+                <div class="flex items-start justify-between mb-3 gap-3">
+                  <div>
+                    <span class="font-display text-warm-fg font-bold text-base">Pedido #{{ shortId(order.id) }}</span>
+                    <p class="text-warm-muted text-sm mt-0.5">{{ order.table?.label ?? 'Mesa' }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-warm-fg font-mono text-sm">{{ fmtTime(order.created_at) }}</p>
+                    <p class="text-xs font-medium mt-0.5" [class]="col.text">{{ elapsed(order) }}</p>
+                  </div>
+                </div>
+
+                <ul class="space-y-1.5 mb-4">
+                  @for (item of order.order_items; track item.id) {
+                    <li class="flex items-center gap-2 text-sm">
+                      <span class="text-amber font-bold w-6 text-center">{{ item.quantity }}×</span>
+                      <span class="text-warm-fg">{{ item.product_name }}</span>
+                    </li>
+                  }
+                </ul>
+
+                @if (col.next; as next) {
+                  <button type="button" (click)="setStatus(order, next)"
+                    class="w-full py-3 rounded-xl text-sm font-semibold transition-all" [class]="col.btnClass">
+                    {{ col.btnLabel }}
+                  </button>
+                } @else {
+                  <div class="flex items-center justify-center gap-2 py-2">
+                    <span class="w-2 h-2 rounded-full bg-status-done"></span>
+                    <span class="text-status-done text-sm font-medium">Terminado</span>
+                  </div>
+                }
+              </article>
+            } @empty {
+              <div class="text-center text-warm-muted text-sm py-10 border border-dashed border-warm-border rounded-xl">Sin pedidos</div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* Paleta y tipografía del diseño de Figma ("Restaurante/bar app") */
+@theme {
+  --color-warm-bg: #18140f;
+  --color-warm-surface: #221d17;
+  --color-warm-surface2: #2d2620;
+  --color-warm-border: #3d342a;
+  --color-warm-fg: #f0e8d8;
+  --color-warm-muted: #9a8a78;
+
+  --color-amber: #c9a042;
+  --color-amber-light: #e8c068;
+  --color-amber-fg: #100e09;
+
+  --color-status-pending: #e53935;
+  --color-status-process: #f5a623;
+  --color-status-done: #4caf50;
+
+  --font-sans: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces Variable", "Fraunces", ui-serif, Georgia, serif;
+}
+
+html,
+body,
+app-root {
+  height: 100%;
+  display: block;
+  font-family: var(--font-sans);
+  background-color: var(--color-warm-bg);
+  color: var(--color-warm-fg);
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-warm-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-warm-border);
+  border-radius: 2px;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animaciones del bottom sheet / modales */
+.sheet-enter {
+  animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Inputs con el estilo del diseño */
+.field,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+select,
+textarea {
+  background-color: var(--color-warm-surface);
+  color: var(--color-warm-fg);
+  border: 1px solid var(--color-warm-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-amber);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-warm-muted);
+}
+select option {
+  background-color: var(--color-warm-surface);
+}
